@@ -7,9 +7,9 @@
      if cleaned.startswith("```"):
          cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
          cleaned = re.sub(r"\s*```$", "", cleaned)
--    match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-+    # Use non-greedy match to avoid excessive CPU on very large outputs
-+    match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
++    # Limit the search space for performance, while keeping a greedy JSON match
++    search_prefix = cleaned[:100_000]
++    match = re.search(r"\{.*\}", search_prefix, re.DOTALL)
      if match:
          cleaned = match.group(0)
      return json.loads(cleaned)
